@@ -17,6 +17,8 @@
 , isGNU ? false, isClang ? cc.isClang or false, gnugrep ? null
 , buildPackages ? {}
 , libcxx ? null
+# This is set to true in `llvmPackages_*.clangUseLLVM`.
+, useLLVM ? stdenvNoCC.targetPlatform.useLLVM or false
 }:
 
 with lib;
@@ -65,7 +67,7 @@ let
   useGccForLibs = isClang
     && libcxx == null
     && !stdenv.targetPlatform.isDarwin
-    && !(stdenv.targetPlatform.useLLVM or false)
+    && !useLLVM
     && !(stdenv.targetPlatform.useAndroidPrebuilt or false)
     && !(stdenv.targetPlatform.isiOS or false)
     && gccForLibs != null;
@@ -321,7 +323,7 @@ stdenv.mkDerivation {
     + optionalString (isClang
                       && targetPlatform.isLinux
                       && !(stdenv.targetPlatform.useAndroidPrebuilt or false)
-                      && !(stdenv.targetPlatform.useLLVM or false)
+                      && !useLLVM
                       && gccForLibs != null) ''
       echo "--gcc-toolchain=${gccForLibs}" >> $out/nix-support/cc-cflags
     ''

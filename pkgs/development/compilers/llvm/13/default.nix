@@ -148,6 +148,8 @@ let
       cc = tools.clang-unwrapped;
       libcxx = targetLlvmLibraries.libcxx;
       bintools = bintools';
+      # Disable `gccForLibs` and `--gcc-toolchain` option.
+      useLLVM = true;
       extraPackages = [
         targetLlvmLibraries.libcxxabi
         targetLlvmLibraries.compiler-rt
