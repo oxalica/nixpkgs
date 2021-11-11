@@ -14,6 +14,7 @@
 , rust-cbindgen, nodejs, nasm, fetchpatch
 , gnum4
 , gtk3, wrapGAppsHook
+, gcc, libgcc
 , debugBuild ? false
 
 ### optionals
@@ -195,6 +196,8 @@ buildStdenv.mkDerivation ({
       wrapGAppsHook
     ]
     ++ lib.optionals buildStdenv.isDarwin [ xcbuild rsync ]
+    # When using LLVM toolchain, some rust crates still link to `libgcc` and/or `libstdc++`.
+    ++ lib.optionals ltoSupport [ (lib.getLib gcc.cc) libgcc ]
     ++ extraNativeBuildInputs;
 
   preConfigure = ''
