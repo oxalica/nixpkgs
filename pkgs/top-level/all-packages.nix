@@ -26286,6 +26286,7 @@ with pkgs;
       (libreoffice-args // {
         kdeIntegration = true;
         variant = "fresh";
+        icu = icu69;
       });
   });
 
@@ -26293,6 +26294,7 @@ with pkgs;
     libreoffice = callPackage ../applications/office/libreoffice
       (libreoffice-args // {
         variant = "fresh";
+        icu = icu69;
       });
   });
   libreoffice-fresh-unwrapped = libreoffice-fresh.libreoffice;
@@ -26301,6 +26303,7 @@ with pkgs;
     libreoffice = callPackage ../applications/office/libreoffice
       (libreoffice-args // {
         variant = "still";
+        icu = icu69;
       });
   });
   libreoffice-still-unwrapped = libreoffice-still.libreoffice;
