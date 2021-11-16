@@ -14,6 +14,7 @@
 , rust-cbindgen, nodejs, nasm, fetchpatch
 , gnum4
 , gtk3, wrapGAppsHook
+, dump_syms
 , debugBuild ? false
 
 ### optionals
@@ -201,6 +202,7 @@ buildStdenv.mkDerivation ({
       wrapGAppsHook
     ]
     ++ lib.optionals buildStdenv.isDarwin [ xcbuild rsync ]
+    ++ lib.optionals (crashreporterSupport && enableDebugSymbols) [ dump_syms python3.pkgs.zstandard ]
     ++ extraNativeBuildInputs;
 
   separateDebugInfo = enableDebugSymbols;
@@ -306,6 +308,9 @@ buildStdenv.mkDerivation ({
   '';
 
   makeFlags = extraMakeFlags;
+
+  MOZ_ENABLE_FULL_SYMBOLS = crashreporterSupport && enableDebugSymbols;
+  buildFlags = lib.optionals (crashreporterSupport && enableDebugSymbols) [ "default" "buildsymbols" ];
 
   enableParallelBuilding = true;
   doCheck = false; # "--disable-tests" above
