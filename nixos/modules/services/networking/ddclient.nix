@@ -36,6 +36,9 @@ let
     '' else ''
       sed -i '/^password=$/d' /run/${RuntimeDirectory}/ddclient.conf
     '')}
+    ${lib.optionalString (cfg.includes != null) ''
+      cat ${escapeShellArgs cfg.includes} >> /run/${RuntimeDirectory}/ddclient.conf
+    ''}
   '';
 
 in
@@ -189,6 +192,15 @@ with lib;
         type = str;
         description = ''
           zone as required by some providers.
+        '';
+      };
+
+      includes = mkOption {
+        default = [];
+        type = listOf path;
+        description = ''
+          Paths to config files to include. They will be read and concatenated to the tail of
+          generated config file at run-time, before starting the unit.
         '';
       };
 
