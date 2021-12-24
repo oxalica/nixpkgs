@@ -11,7 +11,7 @@
 
       lib = import ./lib;
 
-      systems = lib.systems.supported.hydra;
+      systems = lib.systems.supported.hydra ++ [ "riscv64-linux" ];
 
       forAllSystems = f: lib.genAttrs systems (system: f system);
 
