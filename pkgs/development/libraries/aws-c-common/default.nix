@@ -1,6 +1,7 @@
 { lib
 , stdenv
 , fetchFromGitHub
+, fetchpatch
 , cmake
 , coreutils
 }:
@@ -17,6 +18,13 @@ stdenv.mkDerivation rec {
   };
 
   nativeBuildInputs = [ cmake ];
+
+  patches = [
+    (fetchpatch {
+      url = "https://github.com/awslabs/aws-c-common/commit/affba363a7e0814fa7d35cb44e6e77bba9228ce9.patch";
+      sha256 = "sha256-7ZXdhRJuuvTlo+/n6XxoebBRUNnwyvWzj08yzQ5hWpw=";
+    })
+  ];
 
   cmakeFlags = [
     "-DBUILD_SHARED_LIBS=ON"
