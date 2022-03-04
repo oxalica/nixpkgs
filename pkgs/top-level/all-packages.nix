@@ -31105,6 +31105,8 @@ with pkgs;
 
   mars = callPackage ../games/mars { };
 
+  mcaselector = callPackage ../tools/games/minecraft/mcaselector { };
+
   megaglest = callPackage ../games/megaglest { };
 
   methane = callPackage ../games/methane { };
