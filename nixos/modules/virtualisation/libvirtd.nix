@@ -294,6 +294,9 @@ in
         # Copy generated qemu config to libvirt directory
         cp -f ${qemuConfigFile} /var/lib/${dirName}/qemu.conf
 
+        # Link vhost-user-gpu, vhost-user-virtiofsd and firmware configurations.
+        ln -s --force ${cfg.qemu.package}/share/qemu/{vhost-user,firmware} /var/lib/${dirName}/qemu
+
         # stable (not GC'able as in /nix/store) paths for using in <emulator> section of xml configs
         for emulator in ${cfg.package}/libexec/libvirt_lxc ${cfg.qemu.package}/bin/qemu-kvm ${cfg.qemu.package}/bin/qemu-system-*; do
           ln -s --force "$emulator" /run/${dirName}/nix-emulators/
