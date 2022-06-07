@@ -27333,7 +27333,9 @@ with pkgs;
   wlroots_0_15 = callPackage ../development/libraries/wlroots/0.15.nix { };
   wlroots_0_16 = callPackage ../development/libraries/wlroots/0.16.nix { };
 
-  sway-unwrapped = callPackage ../applications/window-managers/sway { };
+  sway-unwrapped = callPackage ../applications/window-managers/sway {
+    wlroots = wlroots_0_16;
+  };
   sway = callPackage ../applications/window-managers/sway/wrapper.nix { };
   swaybg = callPackage ../applications/window-managers/sway/bg.nix { };
   swayidle = callPackage ../applications/window-managers/sway/idle.nix { };

@@ -1,8 +1,8 @@
 { lib, stdenv, fetchFromGitHub, substituteAll, swaybg
 , meson, ninja, pkg-config, wayland-scanner, scdoc
-, wayland, libxkbcommon, pcre, json_c, libevdev
-, pango, cairo, libinput, libcap, pam, gdk-pixbuf, librsvg
-, wlroots, wayland-protocols, libdrm
+, wayland, libxkbcommon, pcre2, json_c, libevdev
+, pango, cairo, libinput, gdk-pixbuf
+, wlroots, wayland-protocols, libdrm, xcbutilwm
 , nixosTests
 # Used by the NixOS module:
 , isNixOS ? false
@@ -23,13 +23,13 @@ let sd-bus-provider = if systemdSupport then "libsystemd" else "basu"; in
 
 stdenv.mkDerivation rec {
   pname = "sway-unwrapped";
-  version = "1.7";
+  version = "1.8-dev";
 
   src = fetchFromGitHub {
     owner = "swaywm";
     repo = "sway";
-    rev = version;
-    sha256 = "0ss3l258blyf2d0lwd7pi7ga1fxfj8pxhag058k7cmjhs3y30y5l";
+    rev = "122d8ce95484bd097bf3a15b8191213bd6969b41";
+    hash = "sha256-LhOkxl0j5CfsWiwJiSYR+Qlk0UZoShQP3NWW4n8Y6pM=";
   };
 
   patches = [
@@ -59,9 +59,9 @@ stdenv.mkDerivation rec {
   ];
 
   buildInputs = [
-    wayland libxkbcommon pcre json_c libevdev
-    pango cairo libinput libcap pam gdk-pixbuf librsvg
-    wayland-protocols libdrm
+    wayland libxkbcommon pcre2 json_c libevdev
+    pango cairo libinput gdk-pixbuf
+    wayland-protocols libdrm xcbutilwm
     (wlroots.override { inherit enableXWayland; })
   ] ++ lib.optionals dbusSupport [
     dbus
