@@ -35,8 +35,6 @@ stdenv.mkDerivation rec {
     librime
   ];
 
-  patches = [ ./fcitx5-rime-with-nix-env-variable.patch ];
-
   meta = with lib; {
     description = "RIME support for Fcitx5";
     homepage = "https://github.com/fcitx/fcitx5-rime";
