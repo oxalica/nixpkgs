@@ -1,22 +1,23 @@
-{ lib, stdenv, fetchurl, nixosTests, jre_headless, version, url, sha1 }:
+{ lib, stdenv, makeWrapper, fetchurl, nixosTests, jre_headless, version, url, sha1 }:
 stdenv.mkDerivation {
   pname = "minecraft-server";
   inherit version;
 
   src = fetchurl { inherit url sha1; };
 
+  nativeBuildInputs = [ makeWrapper ];
+
   preferLocalBuild = true;
 
   installPhase = ''
-    mkdir -p $out/bin $out/lib/minecraft
-    cp -v $src $out/lib/minecraft/server.jar
+    runHook preInstall
 
-    cat > $out/bin/minecraft-server << EOF
-    #!/bin/sh
-    exec ${jre_headless}/bin/java \$@ -jar $out/lib/minecraft/server.jar nogui
-    EOF
+    install -D -T $src $out/lib/minecraft/server.jar
+    makeWrapper ${jre_headless}/bin/java $out/bin/minecraft-server \
+      --add-flags "-jar $out/lib/minecraft/server.jar" \
+      --append-flags "nogui"
 
-    chmod +x $out/bin/minecraft-server
+    runHook postInstall
   '';
 
   dontUnpack = true;
