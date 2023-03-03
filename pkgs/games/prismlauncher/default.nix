@@ -2,25 +2,18 @@
 , stdenv
 , fetchFromGitHub
 , cmake
-, jdk8
 , jdk17
+, wrapQtAppsHook
 , zlib
 , file
-, wrapQtAppsHook
-, xorg
-, libpulseaudio
 , qtbase
 , qtsvg
 , qtwayland
-, libGL
 , quazip
-, glfw
-, openal
 , extra-cmake-modules
 , tomlplusplus
 , ghc_filesystem
 , msaClientID ? ""
-, jdks ? [ jdk17 jdk8 ]
 }:
 
 let
@@ -33,7 +26,7 @@ let
 in
 
 stdenv.mkDerivation rec {
-  pname = "prismlauncher";
+  pname = "prismlauncher-unwrapped";
   version = "6.3";
 
   src = fetchFromGitHub {
@@ -55,7 +48,6 @@ stdenv.mkDerivation rec {
 
   cmakeFlags = lib.optionals (msaClientID != "") [ "-DLauncher_MSA_CLIENT_ID=${msaClientID}" ]
     ++ lib.optionals (lib.versionAtLeast qtbase.version "6") [ "-DLauncher_QT_VERSION_MAJOR=6" ];
-  dontWrapQtApps = true;
 
   postUnpack = ''
     rm -rf source/libraries/libnbtplusplus
@@ -64,30 +56,6 @@ stdenv.mkDerivation rec {
     chmod -R +r+w source/libraries/libnbtplusplus
     chown -R $USER: source/libraries/libnbtplusplus
   '';
-
-  postInstall =
-    let
-      libpath = with xorg;
-        lib.makeLibraryPath [
-          libX11
-          libXext
-          libXcursor
-          libXrandr
-          libXxf86vm
-          libpulseaudio
-          libGL
-          glfw
-          openal
-          stdenv.cc.cc.lib
-        ];
-    in
-    ''
-      # xorg.xrandr needed for LWJGL [2.9.2, 3) https://github.com/LWJGL/lwjgl/issues/128
-      wrapQtApp $out/bin/prismlauncher \
-        --set LD_LIBRARY_PATH /run/opengl-driver/lib:${libpath} \
-        --prefix PRISMLAUNCHER_JAVA_PATHS : ${lib.makeSearchPath "bin/java" jdks} \
-        --prefix PATH : ${lib.makeBinPath [xorg.xrandr]}
-    '';
 
   meta = with lib; {
     homepage = "https://prismlauncher.org/";
