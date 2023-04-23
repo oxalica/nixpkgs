@@ -1,30 +1,42 @@
-{ lib, stdenv, fetchFromGitHub, rustPlatform, installShellFiles, Security, libiconv, Libsystem }:
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  rustPlatform,
+  installShellFiles,
+  Security,
+  libiconv,
+  Libsystem,
+  nix-update-script,
+}:
 
 rustPlatform.buildRustPackage rec {
   pname = "procs";
-  version = "0.13.4";
+  version = "0.14.0";
 
   src = fetchFromGitHub {
     owner = "dalance";
     repo = pname;
     rev = "v${version}";
-    sha256 = "sha256-PTUATmnpJGeY0Ushf7sAapsZ51VC2IdnKMzYJX5+h9A=";
+    sha256 = "sha256-DoH9XxPRKGd+tex8MdbtkhM+V8C1wDMv/GZcB4aMCPc=";
   };
 
-  cargoHash = "sha256-jxGdozSEIop2jBL4lK3ZcEuuR7P8qDoQD/Lrl4yaBN0=";
+  cargoHash = "sha256-B+LpUErsvtLYn+Xvq4KNBpLR9WYe38yMWHUNsd9jIs8=";
 
   nativeBuildInputs = [ installShellFiles ];
 
   LIBCLANG_PATH = lib.optionals stdenv.isDarwin "${stdenv.cc.cc.lib}/lib/";
 
   postInstall = ''
-    for shell in bash fish zsh; do
-      $out/bin/procs --completion $shell
-    done
-    installShellCompletion procs.{bash,fish} --zsh _procs
+    installShellCompletion --cmd procs \
+      --bash <($out/bin/procs --gen-completion bash) \
+      --fish <($out/bin/procs --gen-completion fish) \
+      --zsh  <($out/bin/procs --gen-completion zsh)
   '';
 
   buildInputs = lib.optionals stdenv.isDarwin [ Security libiconv Libsystem ];
+
+  passthru.updateScript = nix-update-script { };
 
   meta = with lib; {
     description = "A modern replacement for ps written in Rust";
