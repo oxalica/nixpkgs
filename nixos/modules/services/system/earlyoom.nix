@@ -101,6 +101,12 @@ in
         [README](https://github.com/rfjakob/earlyoom#notifications) and
         [the man page](https://github.com/rfjakob/earlyoom/blob/master/MANPAGE.md#-n-pathtoscript)
         for details.
+
+        WARNING: earlyoom is running in a sandbox with ProtectSystem="strict"
+        by default, so writing to filesystem is also prohibited for the hook.
+        If you wan to change these protection rules, override the systemd
+        service like
+        `systemd.services.earlyoom.serviceConfig.ProtectSystem = lib.mkForce false;`.
       '';
     };
 
@@ -135,26 +141,28 @@ in
   config = mkIf cfg.enable {
     services.systembus-notify.enable = mkDefault cfg.enableNotifications;
 
+    systemd.packages = [ pkgs.earlyoom ];
+
     systemd.services.earlyoom = {
-      description = "Early OOM Daemon for Linux";
       wantedBy = [ "multi-user.target" ];
+
       path = optional cfg.enableNotifications pkgs.dbus;
-      serviceConfig = {
-        StandardError = "journal";
-        ExecStart = concatStringsSep " " ([
-          "${pkgs.earlyoom}/bin/earlyoom"
-          ("-m ${toString cfg.freeMemThreshold}"
-            + optionalString (cfg.freeMemKillThreshold != null) ",${toString cfg.freeMemKillThreshold}")
-          ("-s ${toString cfg.freeSwapThreshold}"
-            + optionalString (cfg.freeSwapKillThreshold != null) ",${toString cfg.freeSwapKillThreshold}")
-          "-r ${toString cfg.reportInterval}"
-        ]
-        ++ optional cfg.enableDebugInfo "-d"
-        ++ optional cfg.enableNotifications "-n"
-        ++ optional (cfg.killHook != null) "-N ${escapeShellArg cfg.killHook}"
-        ++ cfg.extraArgs
-        );
-      };
+
+      environment.EARLYOOM_ARGS = concatStringsSep " " ([
+        ("-m ${toString cfg.freeMemThreshold}"
+          + optionalString (cfg.freeMemKillThreshold != null) ",${toString cfg.freeMemKillThreshold}")
+        ("-s ${toString cfg.freeSwapThreshold}"
+          + optionalString (cfg.freeSwapKillThreshold != null) ",${toString cfg.freeSwapKillThreshold}")
+        "-r ${toString cfg.reportInterval}"
+      ]
+      ++ optional cfg.enableDebugInfo "-d"
+      ++ optional cfg.enableNotifications "-n"
+      ++ optional (cfg.killHook != null) "-N ${escapeShellArg cfg.killHook}"
+      ++ cfg.extraArgs
+      );
+
+      # We setup `EARLYOOM_ARGS` via drop-ins, so clear this.
+      serviceConfig.EnvironmentFile = "";
     };
   };
 }

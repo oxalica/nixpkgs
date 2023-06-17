@@ -1,0 +1,49 @@
+diff --git a/earlyoom.service.in b/earlyoom.service.in
+index b17d23c..96c97e8 100644
+--- a/earlyoom.service.in
++++ b/earlyoom.service.in
+@@ -9,6 +9,7 @@ ExecStart=:TARGET:/earlyoom $EARLYOOM_ARGS
+ DynamicUser=true
+ # Allow killing processes and calling mlockall()
+ AmbientCapabilities=CAP_KILL CAP_IPC_LOCK
++CapabilityBoundingSet=CAP_KILL CAP_IPC_LOCK
+ # We don't need write access anywhere
+ ProtectSystem=strict
+ # We don't need /home at all, make it inaccessible
+@@ -19,6 +20,36 @@ Restart=always
+ # set memory limits and max tasks number
+ TasksMax=10
+ MemoryMax=50M
++# We print some messages to stderr.
++StandardError=journal
++
++# Sandboxing. Deny everything we don't use.
++
++# Run as an unprivileged user with random user id.
++DynamicUser=true
++# We don't need write access anywhere.
++ProtectSystem=strict
++# We don't need /home at all, make it inaccessible.
++ProtectHome=true
++PrivateDevices=true
++ProtectClock=true
++ProtectHostname=true
++ProtectKernelLogs=true
++ProtectKernelModules=true
++ProtectKernelTunables=true
++ProtectControlGroups=true
++RestrictNamespaces=true
++RestrictRealtime=true
++LockPersonality=true
++PrivateNetwork=true
++IPAddressDeny=true
++
++# Unix socket is used by dbus-send.
++RestrictAddressFamilies=AF_UNIX
++
++SystemCallArchitectures=native
++SystemCallFilter=@system-service
++SystemCallFilter=~@resources @privileged
+ 
+ [Install]
+ WantedBy=multi-user.target

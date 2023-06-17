@@ -13,15 +13,16 @@ stdenv.mkDerivation rec {
 
   nativeBuildInputs = lib.optionals withManpage [ pandoc installShellFiles ];
 
-  patches = [ ./fix-dbus-path.patch ];
+  patches = [
+    ./fix-dbus-path.patch
+    ./systemd-unit-enhancement.patch
+  ];
 
-  makeFlags = [ "VERSION=${version}" ];
-
-  installPhase = ''
-    install -D earlyoom $out/bin/earlyoom
-  '' + lib.optionalString withManpage ''
-    installManPage earlyoom.1
-  '';
+  makeFlags = [
+    "VERSION=${version}"
+    "PREFIX=${placeholder "out"}"
+    "SYSCONFDIR=${placeholder "out"}/etc"
+  ];
 
   passthru.tests = {
     inherit (nixosTests) earlyoom;
@@ -32,6 +33,6 @@ stdenv.mkDerivation rec {
     homepage = "https://github.com/rfjakob/earlyoom";
     license = licenses.mit;
     platforms = platforms.linux;
-    maintainers = with maintainers; [];
+    maintainers = with maintainers; [ oxalica ];
   };
 }
