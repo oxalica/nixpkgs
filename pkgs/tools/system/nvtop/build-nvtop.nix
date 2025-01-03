@@ -34,17 +34,17 @@ let
       }" \
       $out/bin/nvtop
   '';
-  needDrm = (amd || msm || panfrost || panthor);
+  needDrm = (amd || intel || msm || panfrost || panthor);
 in
 stdenv.mkDerivation (finalAttrs: {
   pname = "nvtop";
-  version = "3.1.0";
+  version = "0-unstable-20241230";
 
   src = fetchFromGitHub {
     owner = "Syllo";
     repo = "nvtop";
-    rev = finalAttrs.version;
-    hash = "sha256-MkkBY2PR6FZnmRMqv9MWqwPWRgixfkUQW5TWJtHEzwA=";
+    rev = "c79a9c76fa2903d9ee2922d76848db0a5d9ff6b9";
+    hash = "sha256-ckFi7NO79OFnHJlhek9zQsdCR308wxsMMGtJ7XrgnNo=";
   };
 
   cmakeFlags = with lib.strings; [
