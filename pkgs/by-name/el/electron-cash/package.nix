@@ -69,7 +69,7 @@ python3Packages.buildPythonApplication rec {
   #   Python-only mode.
   #
   # Upstream hardcoded `libsecp256k1.so.0` where we provides
-  # `libsecp256k1.so.5`. The only breaking change is the removal of two
+  # `libsecp256k1.so.6`. The only breaking change is the removal of some
   # functions which seem not used by electron-cash.
   # See: <https://github.com/Electron-Cash/Electron-Cash/issues/3009>
   #
@@ -80,7 +80,7 @@ python3Packages.buildPythonApplication rec {
     substituteInPlace setup.py \
       --replace-fail "(share_dir" '("share"'
     substituteInPlace electroncash/secp256k1.py \
-      --replace-fail "libsecp256k1.so.0" "${secp256k1}/lib/libsecp256k1.so.5"
+      --replace-fail "libsecp256k1.so.0" "${secp256k1}/lib/libsecp256k1.so.6"
     substituteInPlace contrib/requirements/requirements.txt \
       --replace-fail "python-dateutil<2.9" "python-dateutil<2.10"
   '';
